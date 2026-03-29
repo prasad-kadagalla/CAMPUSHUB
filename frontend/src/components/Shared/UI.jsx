@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 
 /* ─── Button ─────────────────────────────────────────────── */
 export const Button = ({
@@ -99,7 +100,7 @@ export const LoadingScreen = () => (
 /* ─── Modal ──────────────────────────────────────────────── */
 export const Modal = ({ isOpen, onClose, title, children, maxWidth = '560px' }) => {
   if (!isOpen) return null;
-  return (
+  return createPortal(
     <div
       style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(4px)', padding:'16px' }}
       onClick={e => e.target === e.currentTarget && onClose()}
@@ -107,12 +108,13 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = '560px' }) 
       <div style={{ background:'var(--card)', border:'1px solid var(--border2)', borderRadius:'20px', padding:'28px', width:'100%', maxWidth, maxHeight:'90vh', overflowY:'auto', boxShadow:'0 0 40px rgba(124,111,252,0.25)', animation:'fadeIn 0.2s ease' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'20px' }}>
           <h3 style={{ fontFamily:"'Syne',sans-serif", fontSize:'18px', fontWeight:700 }}>{title}</h3>
-          <button onClick={onClose} style={{ background:'none', border:'none', color:'var(--text3)', fontSize:'20px', cursor:'pointer', lineHeight:1, transition:'color 0.2s' }}
+          <button type="button" onClick={onClose} style={{ background:'none', border:'none', color:'var(--text3)', fontSize:'20px', cursor:'pointer', lineHeight:1, transition:'color 0.2s' }}
             onMouseEnter={e=>e.target.style.color='var(--coral)'} onMouseLeave={e=>e.target.style.color='var(--text3)'}>✕</button>
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
