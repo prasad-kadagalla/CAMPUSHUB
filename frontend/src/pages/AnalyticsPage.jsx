@@ -47,14 +47,14 @@ export default function AnalyticsPage() {
   return (
     <div className="animate-fadeIn">
       {/* Stats */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:14, marginBottom:28 }}>
+      <div className="grid-cols-4" style={{ marginBottom:28 }}>
         <StatCard icon="🗓️" value={stats.totalEvents}        label="Total Events"    color="purple" trend={`${stats.pendingEvents} pending`} />
         <StatCard icon="📝" value={stats.totalRegistrations} label="Registrations"   color="teal"   trend="All time" />
         <StatCard icon="🎓" value={stats.totalStudents}       label="Students"        color="amber"  trend="Active" />
         <StatCard icon="✅" value={`${stats.attendanceRate}%`} label="Attendance Rate" color="coral" trend="Check-ins" />
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:16, marginBottom:16 }}>
+      <div className="grid-cols-2-1" style={{ marginBottom:16 }}>
         {/* Bar chart */}
         <div style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:14, padding:20 }}>
           <h3 style={{ fontFamily:"'Syne',sans-serif", fontSize:14, fontWeight:700, marginBottom:20 }}>Registrations by Category</h3>
@@ -95,7 +95,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Line chart + Popular */}
-      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:16 }}>
+      <div className="grid-cols-2-1">
         <div style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:14, padding:20 }}>
           <h3 style={{ fontFamily:"'Syne',sans-serif", fontSize:14, fontWeight:700, marginBottom:20 }}>Monthly Registrations</h3>
           {monthData.length === 0 ? (
@@ -135,7 +135,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Summary cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:14, marginTop:16 }}>
+      <div className="grid-cols-3" style={{ marginTop:16 }}>
         {[
           { label:'Approved Events',  value: stats.approvedEvents,  color:'var(--green)',  icon:'✅' },
           { label:'Organizers',       value: stats.totalOrganizers, color:'var(--teal)',   icon:'🎪' },

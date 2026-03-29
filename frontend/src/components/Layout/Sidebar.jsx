@@ -43,11 +43,10 @@ export default function Sidebar({ mobileOpen, onClose }) {
           className="mobile-overlay" />
       )}
 
-      <aside style={{
+      <aside className={mobileOpen ? 'open' : ''} style={{
         width: 'var(--sidebar-width)', background: 'var(--card)',
         borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column',
         position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 100,
-        transform: mobileOpen ? 'translateX(0)' : undefined,
         transition: 'transform 0.3s',
       }}>
         {/* Logo */}

@@ -94,7 +94,7 @@ export default function ManageEventsPage() {
       ) : events.length === 0 ? (
         <EmptyState emoji="📋" title="No events yet" subtitle="Create your first event to get started." />
       ) : (
-        <div style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:14, overflow:'hidden' }}>
+        <div className="table-container" style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:14, overflow:'hidden' }}>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 90px 80px 80px 100px 130px', padding:'10px 18px', background:'var(--bg3)', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', color:'var(--text3)' }}>
             <div>Event</div><div>Date</div><div>Category</div><div>Registered</div><div>Status</div><div>Actions</div>
           </div>
@@ -126,7 +126,7 @@ export default function ManageEventsPage() {
           <FormField label="Event Title" required>
             <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="e.g. Tech Symposium 2025" />
           </FormField>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          <div className="grid-cols-2" style={{ marginBottom: 12 }}>
             <FormField label="Category" required>
               <select value={form.category} onChange={e => set('category', e.target.value)}>
                 <option value="technical">Technical</option>
@@ -139,7 +139,7 @@ export default function ManageEventsPage() {
               <input value={form.venue} onChange={e => set('venue', e.target.value)} placeholder="Auditorium A" />
             </FormField>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          <div className="grid-cols-2" style={{ marginBottom: 12 }}>
             <FormField label="Date" required>
               <input type="date" value={form.date} onChange={e => set('date', e.target.value)} />
             </FormField>
@@ -147,7 +147,7 @@ export default function ManageEventsPage() {
               <input type="time" value={form.time} onChange={e => set('time', e.target.value)} />
             </FormField>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          <div className="grid-cols-2" style={{ marginBottom: 12 }}>
             <FormField label="Participant Limit" required>
               <input type="number" value={form.participantLimit} onChange={e => set('participantLimit', e.target.value)} placeholder="100" min="1" />
             </FormField>

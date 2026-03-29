@@ -82,7 +82,7 @@ export default function DashboardPage() {
 
       {/* Stats */}
       {!loading && (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:14, marginBottom:24 }}>
+        <div className="grid-cols-4" style={{ marginBottom:24 }}>
           {statCards.map((s, i) => <StatCard key={i} {...s} />)}
         </div>
       )}
@@ -101,13 +101,13 @@ export default function DashboardPage() {
       </div>
 
       {loading ? (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+        <div className="grid-cols-3">
           {[1,2,3].map(i => <div key={i} style={{ background:'var(--card)', borderRadius:16, height:220, animation:'pulse 1.5s ease infinite' }} />)}
         </div>
       ) : events.length === 0 ? (
         <EmptyState emoji="🎪" title="No events yet" subtitle="Events will appear here once created and approved." />
       ) : (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+        <div className="grid-cols-3">
           {events.map(ev => <MiniEventCard key={ev._id} event={ev} onClick={() => navigate(`/events`)} />)}
         </div>
       )}

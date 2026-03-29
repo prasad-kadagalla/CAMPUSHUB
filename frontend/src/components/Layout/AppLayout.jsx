@@ -23,9 +23,9 @@ export default function AppLayout() {
     <div style={{ display:'flex', minHeight:'100vh' }}>
       <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-      <div style={{ marginLeft:'var(--sidebar-width)', flex:1, display:'flex', flexDirection:'column', minHeight:'100vh' }}>
+      <div className="main-content" style={{ marginLeft:'var(--sidebar-width)', flex:1, display:'flex', flexDirection:'column', minHeight:'100vh', transition: 'margin-left 0.3s' }}>
         {/* Topbar */}
-        <header style={{ background:'var(--card)', borderBottom:'1px solid var(--border)', padding:'0 28px', height:'var(--topbar-height)', display:'flex', alignItems:'center', gap:16, position:'sticky', top:0, zIndex:50 }}>
+        <header className="app-header" style={{ background:'var(--card)', borderBottom:'1px solid var(--border)', padding:'0 28px', height:'var(--topbar-height)', display:'flex', alignItems:'center', gap:16, position:'sticky', top:0, zIndex:50, transition: 'padding 0.3s' }}>
           {/* Mobile hamburger */}
           <button onClick={() => setMobileOpen(o => !o)}
             style={{ display:'none', background:'none', border:'none', color:'var(--text)', fontSize:22, cursor:'pointer' }}
@@ -35,7 +35,7 @@ export default function AppLayout() {
 
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
             {/* Search */}
-            <div style={{ background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:10, padding:'7px 14px', display:'flex', alignItems:'center', gap:8, width:200 }}>
+            <div className="app-search" style={{ background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:10, padding:'7px 14px', display:'flex', alignItems:'center', gap:8, width:200, transition: 'width 0.3s' }}>
               <span style={{ color:'var(--text3)', fontSize:13 }}>🔍</span>
               <input type="text" placeholder="Search events..." style={{ background:'none', border:'none', outline:'none', color:'var(--text)', fontSize:13, width:'100%', padding:0 }} />
             </div>
@@ -58,10 +58,13 @@ export default function AppLayout() {
 
       <style>{`
         @media (max-width: 768px) {
-          aside { transform: translateX(-100%); }
+          aside { transform: translateX(-100%) !important; }
           aside.open { transform: translateX(0) !important; }
           .mobile-menu-btn { display: flex !important; }
           main { padding: 16px !important; }
+          .app-header { padding: 0 16px !important; gap: 8px !important; }
+          .app-search { width: 130px !important; }
+          .app-search input::placeholder { color: transparent; }
         }
       `}</style>
     </div>
