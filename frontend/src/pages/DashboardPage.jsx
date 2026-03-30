@@ -65,8 +65,8 @@ export default function DashboardPage() {
   return (
     <div className="animate-fadeIn">
       {/* Welcome banner */}
-      <div style={{ background:'linear-gradient(135deg,rgba(124,111,252,0.15),rgba(25,227,203,0.08))', border:'1px solid var(--border2)', borderRadius:16, padding:'20px 24px', marginBottom:24, display:'flex', alignItems:'center', justifyContent:'space-between', position:'relative', overflow:'hidden' }}>
-        <div style={{ position:'absolute', right:-30, top:-30, width:120, height:120, borderRadius:'50%', background:'var(--purple3)', opacity:0.08, filter:'blur(30px)' }} />
+      <div style={{ background:'var(--card)', boxShadow:'var(--shadow-sm)', border:'1px solid var(--border)', borderRadius:16, padding:'20px 24px', marginBottom:24, display:'flex', alignItems:'center', justifyContent:'space-between', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', right:-30, top:-30, width:150, height:150, borderRadius:'50%', background:'linear-gradient(135deg,var(--purple),var(--teal))', opacity:0.1, filter:'blur(30px)' }} />
         <div>
           <h2 style={{ fontFamily:"'Syne',sans-serif", fontSize:20, fontWeight:800, marginBottom:4 }}>
             {greeting}, {user?.name?.split(' ')[0]}! {greetEmoji}
@@ -93,8 +93,8 @@ export default function DashboardPage() {
           {user.role === 'organizer' ? 'My Recent Events' : 'Upcoming Events'}
         </h3>
         <button onClick={() => navigate(user.role === 'organizer' ? '/manage-events' : '/events')}
-          style={{ background:'none', border:'1px solid var(--border)', borderRadius:8, padding:'6px 14px', color:'var(--purple2)', fontSize:12, cursor:'pointer', fontWeight:500, transition:'all 0.2s' }}
-          onMouseEnter={e=>{e.currentTarget.style.background='rgba(124,111,252,0.1)';}}
+          style={{ background:'none', border:'1px solid var(--border)', borderRadius:8, padding:'6px 14px', color:'var(--purple)', fontSize:12, cursor:'pointer', fontWeight:500, transition:'all 0.2s' }}
+          onMouseEnter={e=>{e.currentTarget.style.background='#EEF2FF';}}
           onMouseLeave={e=>{e.currentTarget.style.background='none';}}>
           View all →
         </button>
@@ -117,7 +117,9 @@ export default function DashboardPage() {
         <>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', margin:'24px 0 16px' }}>
             <h3 style={{ fontFamily:"'Syne',sans-serif", fontSize:16, fontWeight:700 }}>My Registered Events</h3>
-            <button onClick={() => navigate('/my-events')} style={{ background:'none', border:'1px solid var(--border)', borderRadius:8, padding:'6px 14px', color:'var(--purple2)', fontSize:12, cursor:'pointer' }}>View all →</button>
+            <button onClick={() => navigate('/my-events')} style={{ background:'none', border:'1px solid var(--border)', borderRadius:8, padding:'6px 14px', color:'var(--purple)', fontSize:12, cursor:'pointer', transition: 'all 0.2s' }}
+              onMouseEnter={e=>{e.currentTarget.style.background='#EEF2FF';}}
+              onMouseLeave={e=>{e.currentTarget.style.background='none';}}>View all →</button>
           </div>
           <div style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:14, overflow:'hidden' }}>
             {myRegs.slice(0, 3).map((reg, i) => (
@@ -138,7 +140,7 @@ export default function DashboardPage() {
             <p style={{ fontWeight:600, marginBottom:3 }}>⚠️ {stats.pendingEvents} events awaiting approval</p>
             <p style={{ fontSize:13, color:'var(--text2)' }}>Review and approve or reject pending events.</p>
           </div>
-          <button onClick={() => navigate('/approve')} style={{ background:'var(--amber)', border:'none', borderRadius:8, padding:'8px 16px', color:'#000', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+          <button onClick={() => navigate('/approve')} style={{ background:'var(--amber)', border:'none', borderRadius:8, padding:'8px 16px', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}>
             Review Now
           </button>
         </div>
@@ -149,14 +151,14 @@ export default function DashboardPage() {
 
 function MiniEventCard({ event, onClick }) {
   const catEmojis = { technical:'💻', cultural:'🎭', sports:'🏅', workshop:'🔧' };
-  const catBg     = { technical:'#1a1c40', cultural:'#2e1a20', sports:'#0e2828', workshop:'#2a2010' };
+  const catBg     = { technical:'#EEF2FF', cultural:'#FEF3C7', sports:'#E6FFFA', workshop:'#F3F4F6' };
   const pct = event.participantLimit ? Math.round((event.registrationCount / event.participantLimit) * 100) : 0;
 
   return (
     <div onClick={onClick} style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:16, overflow:'hidden', cursor:'pointer', transition:'all 0.2s' }}
-      onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 0 30px rgba(124,111,252,0.2)';e.currentTarget.style.borderColor='var(--border2)';}}
+      onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='var(--shadow-md)';e.currentTarget.style.borderColor='var(--border2)';}}
       onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='';e.currentTarget.style.borderColor='';}}>
-      <div style={{ height:120, background:catBg[event.category]||'#1a1c35', display:'flex', alignItems:'center', justifyContent:'center', fontSize:44, position:'relative' }}>
+      <div style={{ height:120, background:catBg[event.category]||'var(--bg2)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:44, position:'relative' }}>
         <Badge color={categoryColor(event.category)} style={{ position:'absolute', top:8, left:8 }}>{event.category}</Badge>
         <span>{catEmojis[event.category]||'🎪'}</span>
         <Badge color={statusColor(event.status)} style={{ position:'absolute', top:8, right:8 }}>{event.status}</Badge>

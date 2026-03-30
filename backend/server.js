@@ -8,8 +8,17 @@ dotenv.config();
 
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+const PORT = process.env.PORT || 5000;
+connectDB().then(async () => {
+  if (!process.env.MONGO_URI) {
+    console.log('Seeding in-memory DB...');
+    const seed = require('./utils/seed');
+    await seed();
+  }
+  app.listen(PORT, () => {
+    console.log(`🚀 CampusHub API running on http://localhost:${PORT}`);
+  });
+});
 
 // Middleware
 app.use(cors({
@@ -50,7 +59,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 CampusHub API running on http://localhost:${PORT}`);
-});
+// End

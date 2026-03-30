@@ -27,7 +27,7 @@ export default function NotificationsPage() {
         {unread > 0 && (
           <button onClick={markAll}
             style={{ background:'none', border:'1px solid var(--border)', borderRadius:8, padding:'6px 14px', color:'var(--purple2)', fontSize:12, cursor:'pointer', transition:'all 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(124,111,252,0.1)'}
+            onMouseEnter={e => e.currentTarget.style.background = '#EEF2FF'}
             onMouseLeave={e => e.currentTarget.style.background = 'none'}>
             Mark all as read
           </button>
@@ -37,9 +37,9 @@ export default function NotificationsPage() {
       <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
         {notifs.map(n => (
           <div key={n.id} onClick={() => markRead(n.id)}
-            style={{ background:'var(--card)', border:`1px solid ${n.read ? 'var(--border)' : 'rgba(124,111,252,0.4)'}`, borderRadius:12, padding:'14px 16px', display:'flex', gap:12, alignItems:'flex-start', cursor:'pointer', transition:'all 0.2s', background: n.read ? 'var(--card)' : 'rgba(124,111,252,0.05)' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor='var(--border2)'; e.currentTarget.style.transform='translateX(4px)'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = n.read ? 'var(--border)' : 'rgba(124,111,252,0.4)'; e.currentTarget.style.transform=''; }}>
+            style={{ background:'var(--card)', border:`1px solid ${n.read ? 'var(--border)' : 'var(--purple)'}`, borderRadius:12, padding:'14px 16px', display:'flex', gap:12, alignItems:'flex-start', cursor:'pointer', transition:'all 0.2s', background: n.read ? 'var(--card)' : '#EEF2FF' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor='var(--purple)'; e.currentTarget.style.transform='translateX(4px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = n.read ? 'var(--border)' : 'var(--purple)'; e.currentTarget.style.transform=''; }}>
             <div style={{ width:36, height:36, borderRadius:10, background:'var(--bg3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16, flexShrink:0 }}>
               {n.icon}
             </div>

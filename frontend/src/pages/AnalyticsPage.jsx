@@ -12,8 +12,8 @@ const COLORS = { technical:'#7c6ffc', cultural:'#ff6b6b', sports:'#19e3cb', work
 const PIE_COLORS = ['#7c6ffc','#ff6b6b','#19e3cb','#fbbf24'];
 
 const TooltipStyle = {
-  contentStyle: { background:'#1a1c35', border:'1px solid rgba(124,111,252,0.35)', borderRadius:10, color:'#f0f0ff', fontSize:12 },
-  cursor: { fill:'rgba(124,111,252,0.08)' },
+  contentStyle: { background:'var(--card)', border:'1px solid var(--border)', borderRadius:10, color:'var(--text)', fontSize:12, boxShadow:'var(--shadow-md)' },
+  cursor: { fill:'var(--bg2)' },
 };
 
 export default function AnalyticsPage() {
@@ -63,7 +63,7 @@ export default function AnalyticsPage() {
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={catChartData} margin={{ top:0, right:10, left:-20, bottom:0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(124,111,252,0.1)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="name" tick={{ fill:'var(--text2)', fontSize:11 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill:'var(--text3)', fontSize:10 }} axisLine={false} tickLine={false} />
                 <Tooltip {...TooltipStyle} />
@@ -103,7 +103,7 @@ export default function AnalyticsPage() {
           ) : (
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={monthData} margin={{ top:0, right:10, left:-20, bottom:0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(124,111,252,0.1)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="month" tick={{ fill:'var(--text2)', fontSize:10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill:'var(--text3)', fontSize:10 }} axisLine={false} tickLine={false} />
                 <Tooltip {...TooltipStyle} />

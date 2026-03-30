@@ -9,18 +9,6 @@ const Registration = require('../models/Registration');
 const Attendance = require('../models/Attendance');
 
 const seed = async () => {
-  let mongoUri = process.env.MONGO_URI;
-
-  // If no MONGO_URI or it's the default local one, use in-memory server
-  if (!mongoUri || mongoUri === 'mongodb://localhost:27017/campushub') {
-    const mongoServer = await MongoMemoryServer.create();
-    mongoUri = mongoServer.getUri();
-    console.log('🧠 Using in-memory MongoDB for seeding');
-  }
-
-  await mongoose.connect(mongoUri);
-  console.log('🔌 Connected to MongoDB');
-
   // Clear existing data
   await User.deleteMany({});
   await Event.deleteMany({});
@@ -146,8 +134,10 @@ const seed = async () => {
   console.log('  Admin:     admin@college.edu     / admin123');
   console.log('  Organizer: csclub@college.edu    / org123');
   console.log('  Student:   arjun@college.edu     / student123');
-
-  process.exit(0);
 };
 
-seed().catch(err => { console.error(err); process.exit(1); });
+if (require.main === module) {
+  seed().then(() => process.exit(0)).catch(err => { console.error(err); process.exit(1); });
+} else {
+  module.exports = seed;
+}

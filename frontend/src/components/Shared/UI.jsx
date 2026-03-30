@@ -19,10 +19,10 @@ export const Button = ({
     lg: { padding: '13px 28px', fontSize: '15px' },
   };
   const variants = {
-    primary:   { background: 'linear-gradient(135deg,#5a4df5,#7c6ffc)', color: '#fff', boxShadow: '0 4px 16px rgba(124,111,252,0.35)' },
-    secondary: { background: 'var(--bg3)', border: '1px solid var(--border)', color: 'var(--text2)' },
-    danger:    { background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.4)', color: 'var(--coral)' },
-    success:   { background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.4)', color: 'var(--green)' },
+    primary:   { background: 'var(--purple)', color: '#fff', boxShadow: 'var(--shadow-sm)' },
+    secondary: { background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text)' },
+    danger:    { background: '#FEE2E2', border: 'none', color: 'var(--coral)' },
+    success:   { background: '#D1FAE5', border: 'none', color: 'var(--green)' },
     ghost:     { background: 'none', border: 'none', color: 'var(--text2)', padding: '6px 10px' },
   };
   return (
@@ -35,12 +35,12 @@ export const Button = ({
 /* ─── Badge ──────────────────────────────────────────────── */
 export const Badge = ({ children, color = 'purple', style: s }) => {
   const colors = {
-    purple: { bg: 'rgba(124,111,252,0.15)', text: 'var(--purple2)', border: 'rgba(124,111,252,0.35)' },
-    teal:   { bg: 'rgba(25,227,203,0.15)',  text: 'var(--teal)',    border: 'rgba(25,227,203,0.3)' },
-    amber:  { bg: 'rgba(251,191,36,0.15)',  text: 'var(--amber)',   border: 'rgba(251,191,36,0.3)' },
-    coral:  { bg: 'rgba(255,107,107,0.15)', text: 'var(--coral)',   border: 'rgba(255,107,107,0.3)' },
-    green:  { bg: 'rgba(74,222,128,0.15)',  text: 'var(--green)',   border: 'rgba(74,222,128,0.3)' },
-    gray:   { bg: 'rgba(107,107,142,0.2)',  text: 'var(--text3)',   border: 'transparent' },
+    purple: { bg: '#EEF2FF', text: 'var(--purple)', border: 'transparent' },
+    teal:   { bg: '#E6FFFA',  text: 'var(--teal)',    border: 'transparent' },
+    amber:  { bg: '#FEF3C7',  text: 'var(--amber)',   border: 'transparent' },
+    coral:  { bg: '#FEE2E2', text: 'var(--coral)',   border: 'transparent' },
+    green:  { bg: '#D1FAE5',  text: 'var(--green)',   border: 'transparent' },
+    gray:   { bg: 'var(--bg2)',  text: 'var(--text2)',   border: 'transparent' },
   };
   const c = colors[color] || colors.gray;
   return (
@@ -74,7 +74,7 @@ export const Card = ({ children, style: s, onClick, hover = false }) => (
       transition: hover ? 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' : undefined,
       cursor: onClick ? 'pointer' : undefined, ...s,
     }}
-    onMouseEnter={hover && onClick ? e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 0 40px rgba(124,111,252,0.25)'; e.currentTarget.style.borderColor='rgba(124,111,252,0.35)'; } : undefined}
+    onMouseEnter={hover && onClick ? e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='var(--shadow-lg)'; e.currentTarget.style.borderColor='var(--border2)'; } : undefined}
     onMouseLeave={hover && onClick ? e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=''; e.currentTarget.style.borderColor=''; } : undefined}
   >
     {children}
@@ -102,10 +102,10 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = '560px' }) 
   if (!isOpen) return null;
   return createPortal(
     <div
-      style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(4px)', padding:'16px' }}
+      style={{ position:'fixed', inset:0, background:'rgba(17,24,39,0.4)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(4px)', padding:'16px' }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <div style={{ background:'var(--card)', border:'1px solid var(--border2)', borderRadius:'20px', padding:'28px', width:'100%', maxWidth, maxHeight:'90vh', overflowY:'auto', boxShadow:'0 0 40px rgba(124,111,252,0.25)', animation:'fadeIn 0.2s ease' }}>
+      <div style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:'20px', padding:'28px', width:'100%', maxWidth, maxHeight:'90vh', overflowY:'auto', boxShadow:'var(--shadow-lg)', animation:'fadeIn 0.2s ease' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'20px' }}>
           <h3 style={{ fontFamily:"'Syne',sans-serif", fontSize:'18px', fontWeight:700 }}>{title}</h3>
           <button type="button" onClick={onClose} style={{ background:'none', border:'none', color:'var(--text3)', fontSize:'20px', cursor:'pointer', lineHeight:1, transition:'color 0.2s' }}
@@ -121,12 +121,12 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = '560px' }) 
 /* ─── StatCard ───────────────────────────────────────────── */
 export const StatCard = ({ icon, value, label, trend, trendUp = true, color = 'purple' }) => {
   const gradients = {
-    purple: 'rgba(124,111,252,0.08)', teal: 'rgba(25,227,203,0.08)',
-    amber: 'rgba(251,191,36,0.08)', coral: 'rgba(255,107,107,0.08)',
+    purple: '#EEF2FF', teal: '#E6FFFA',
+    amber: '#FEF3C7', coral: '#FEE2E2',
   };
   return (
     <div style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:'14px', padding:'18px 20px', position:'relative', overflow:'hidden', transition:'transform 0.2s, box-shadow 0.2s' }}
-      onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='0 0 24px rgba(124,111,252,0.15)';}}
+      onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='var(--shadow-md)';}}
       onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='';}}>
       <div style={{ position:'absolute', top:-30, right:-30, width:100, height:100, borderRadius:'50%', background:gradients[color]||gradients.purple, filter:'blur(20px)' }} />
       <div style={{ fontSize:22, marginBottom:10 }}>{icon}</div>

@@ -53,9 +53,9 @@ export default function ApproveEventsPage() {
         {STATUS_FILTERS.map(s => (
           <button key={s} onClick={() => setFilter(s)}
             style={{ padding:'8px 18px', borderRadius:8, border:'1px solid', fontSize:12, fontWeight:500, cursor:'pointer', transition:'all 0.2s', textTransform:'capitalize',
-              background: filter===s ? 'rgba(124,111,252,0.15)' : 'var(--bg3)',
+              background: filter===s ? '#EEF2FF' : 'var(--bg2)',
               borderColor: filter===s ? 'var(--purple)' : 'var(--border)',
-              color: filter===s ? 'var(--purple2)' : 'var(--text2)',
+              color: filter===s ? 'var(--purple)' : 'var(--text2)',
             }}>
             {s}
           </button>

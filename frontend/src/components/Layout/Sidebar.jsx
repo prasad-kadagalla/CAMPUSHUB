@@ -52,8 +52,8 @@ export default function Sidebar({ mobileOpen, onClose }) {
         {/* Logo */}
         <div style={{ padding: '20px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <div style={{ width:38, height:38, background:'linear-gradient(135deg,#5a4df5,#19e3cb)', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>🎓</div>
-            <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:18, background:'linear-gradient(90deg,var(--purple2),var(--teal))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>CampusHub</div>
+            <div style={{ width:38, height:38, background:'linear-gradient(135deg,var(--purple),var(--teal))', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>🎓</div>
+            <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:18, background:'linear-gradient(90deg,var(--purple),var(--teal))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>CampusHub</div>
           </div>
         </div>
 
@@ -68,18 +68,18 @@ export default function Sidebar({ mobileOpen, onClose }) {
               <div key={item.path} onClick={() => go(item.path)}
                 style={{
                   display:'flex', alignItems:'center', gap:10, padding:'9px 10px', borderRadius:8,
-                  cursor:'pointer', color: active ? 'var(--purple2)' : 'var(--text2)',
-                  background: active ? 'rgba(124,111,252,0.15)' : 'transparent',
+                  cursor:'pointer', color: active ? 'var(--purple)' : 'var(--text2)',
+                  background: active ? '#EEF2FF' : 'transparent',
                   fontSize:13, fontWeight:500, transition:'all 0.15s', marginBottom:2,
                   position:'relative',
                 }}
-                onMouseEnter={e => { if (!active) { e.currentTarget.style.background='var(--bg3)'; e.currentTarget.style.color='var(--text)'; }}}
+                onMouseEnter={e => { if (!active) { e.currentTarget.style.background='var(--bg2)'; e.currentTarget.style.color='var(--text)'; }}}
                 onMouseLeave={e => { if (!active) { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='var(--text2)'; }}}
               >
                 {active && <div style={{ position:'absolute', left:-10, top:'50%', transform:'translateY(-50%)', width:3, height:'60%', background:'var(--purple)', borderRadius:'0 2px 2px 0' }} />}
                 <span style={{ fontSize:15 }}>{item.icon}</span>
                 <span style={{ flex:1 }}>{item.label}</span>
-                {item.badge && <span style={{ background:'var(--purple3)', color:'#fff', fontSize:10, padding:'2px 6px', borderRadius:20, fontWeight:700 }}>2</span>}
+                {item.badge && <span style={{ background:'var(--purple)', color:'#fff', fontSize:10, padding:'2px 6px', borderRadius:20, fontWeight:700 }}>2</span>}
               </div>
             );
           })}
@@ -87,14 +87,14 @@ export default function Sidebar({ mobileOpen, onClose }) {
 
         {/* User */}
         <div style={{ padding:'14px 16px', borderTop:'1px solid var(--border)', display:'flex', alignItems:'center', gap:10 }}>
-          <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#5a4df5,#19e3cb)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{initials}</div>
+          <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,var(--purple),var(--teal))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{initials}</div>
           <div style={{ flex:1, overflow:'hidden' }}>
             <div style={{ fontSize:12, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{user?.name}</div>
             <div style={{ fontSize:10, color:'var(--text3)', textTransform:'capitalize' }}>{user?.role}</div>
           </div>
           <button onClick={logout} title="Logout"
             style={{ background:'none', border:'none', color:'var(--text3)', fontSize:16, cursor:'pointer', padding:'4px', borderRadius:6, transition:'all 0.2s', lineHeight:1 }}
-            onMouseEnter={e=>{e.target.style.color='var(--coral)';e.target.style.background='rgba(255,107,107,0.1)';}}
+            onMouseEnter={e=>{e.target.style.color='var(--coral)';e.target.style.background='#FEE2E2';}}
             onMouseLeave={e=>{e.target.style.color='var(--text3)';e.target.style.background='none';}}>
             ↩
           </button>

@@ -93,11 +93,11 @@ export default function AuthPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', padding: '16px' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,111,252,0.18) 0%, transparent 70%)' }} />
-      <div style={{ position: 'absolute', width: 400, height: 400, borderRadius: '50%', background: '#5a4df5', filter: 'blur(80px)', opacity: 0.18, top: -100, left: -100 }} />
-      <div style={{ position: 'absolute', width: 300, height: 300, borderRadius: '50%', background: '#0ab5a0', filter: 'blur(80px)', opacity: 0.12, bottom: -80, right: -80 }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79, 70, 229, 0.08) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', width: 400, height: 400, borderRadius: '50%', background: 'var(--purple)', filter: 'blur(80px)', opacity: 0.1, top: -100, left: -100 }} />
+      <div style={{ position: 'absolute', width: 300, height: 300, borderRadius: '50%', background: 'var(--teal)', filter: 'blur(80px)', opacity: 0.08, bottom: -80, right: -80 }} />
 
-      <div style={{ background: 'var(--card)', border: '1px solid var(--border2)', borderRadius: 24, padding: '40px', width: '100%', maxWidth: 420, position: 'relative', zIndex: 2, boxShadow: '0 0 40px rgba(124,111,252,0.2)', animation: 'fadeIn 0.4s ease' }}>
+      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 24, padding: '40px', width: '100%', maxWidth: 420, position: 'relative', zIndex: 2, boxShadow: 'var(--shadow-lg)', animation: 'fadeIn 0.4s ease' }}>
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
           <div style={{ width: 42, height: 42, background: 'linear-gradient(135deg,#5a4df5,#19e3cb)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🎓</div>
@@ -139,7 +139,7 @@ export default function AuthPage() {
               Quick demo:{' '}
               {['student', 'organizer', 'admin'].map(r => (
                 <span key={r} onClick={() => quickLogin(r)}
-                  style={{ color: 'var(--purple2)', cursor: loading ? 'default' : 'pointer', marginRight: 6, textTransform: 'capitalize' }}
+                  style={{ color: 'var(--purple)', cursor: loading ? 'default' : 'pointer', marginRight: 6, textTransform: 'capitalize' }}
                   onMouseEnter={e => { if (!loading) e.target.style.textDecoration = 'underline'; }}
                   onMouseLeave={e => e.target.style.textDecoration = 'none'}>
                   {r}
@@ -179,7 +179,7 @@ export default function AuthPage() {
               <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
                 {roles.map(r => (
                   <div key={r.id} onClick={() => setRole(r.id)}
-                    style={{ flex: 1, padding: '8px 12px', background: role === r.id ? 'rgba(124,111,252,0.15)' : 'var(--bg3)', border: `1px solid ${role === r.id ? 'var(--purple)' : 'var(--border)'}`, borderRadius: 8, color: role === r.id ? 'var(--purple2)' : 'var(--text2)', fontSize: 12, cursor: 'pointer', textAlign: 'center', fontWeight: 500, transition: 'all 0.2s', userSelect: 'none' }}>
+                    style={{ flex: 1, padding: '8px 12px', background: role === r.id ? '#EEF2FF' : 'var(--bg2)', border: `1px solid ${role === r.id ? 'var(--purple)' : 'var(--border)'}`, borderRadius: 8, color: role === r.id ? 'var(--purple)' : 'var(--text2)', fontSize: 12, cursor: 'pointer', textAlign: 'center', fontWeight: 500, transition: 'all 0.2s', userSelect: 'none' }}>
                     {r.label}
                   </div>
                 ))}
@@ -198,7 +198,7 @@ export default function AuthPage() {
 
             <p style={{ textAlign: 'center', marginTop: 14, fontSize: 12, color: 'var(--text3)' }}>
               Already have an account?{' '}
-              <span onClick={() => setTab('login')} style={{ color: 'var(--purple2)', cursor: 'pointer' }}>
+              <span onClick={() => setTab('login')} style={{ color: 'var(--purple)', cursor: 'pointer', fontWeight: 600 }}>
                 Login
               </span>
             </p>

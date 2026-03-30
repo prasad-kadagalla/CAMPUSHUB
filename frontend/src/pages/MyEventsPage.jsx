@@ -130,7 +130,7 @@ function ActionBtn({ children, onClick, color }) {
 function CertificateView({ event, user, onDownload }) {
   return (
     <div>
-      <div style={{ background:'linear-gradient(135deg,#0d0f22,#1a1c40)', border:'2px solid var(--purple)', borderRadius:16, padding:28, textAlign:'center', position:'relative', overflow:'hidden' }}>
+      <div style={{ background:'var(--bg2)', border:'2px solid var(--border)', borderRadius:16, padding:28, textAlign:'center', position:'relative', overflow:'hidden' }}>
         <div style={{ position:'absolute', inset:0, opacity:0.04, background:'repeating-linear-gradient(45deg,var(--purple) 0,var(--purple) 1px,transparent 0,transparent 50%)', backgroundSize:'20px 20px' }} />
         <div style={{ fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', color:'var(--purple2)', marginBottom:8, position:'relative' }}>Certificate of Participation</div>
         <div style={{ fontFamily:"'Syne',sans-serif", fontSize:24, fontWeight:800, marginBottom:16, background:'linear-gradient(90deg,var(--purple2),var(--teal))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', position:'relative' }}>CampusHub</div>

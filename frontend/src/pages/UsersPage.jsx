@@ -57,9 +57,9 @@ export default function UsersPage() {
         {['all','student','organizer','admin'].map(r => (
           <button key={r} onClick={() => setFilter(r)}
             style={{ padding:'8px 16px', borderRadius:8, border:'1px solid', fontSize:12, fontWeight:500, cursor:'pointer', transition:'all 0.2s', textTransform:'capitalize',
-              background: filter===r ? 'rgba(124,111,252,0.15)' : 'var(--bg3)',
+              background: filter===r ? '#EEF2FF' : 'var(--bg2)',
               borderColor: filter===r ? 'var(--purple)' : 'var(--border)',
-              color: filter===r ? 'var(--purple2)' : 'var(--text2)',
+              color: filter===r ? 'var(--purple)' : 'var(--text2)',
             }}>
             {r === 'all' ? 'All Users' : r}
           </button>
