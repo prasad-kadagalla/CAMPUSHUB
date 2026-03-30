@@ -9,6 +9,8 @@ const { sendRegistrationEmail } = require('../utils/mailer');
 // @route POST /api/registrations/:eventId
 exports.registerForEvent = async (req, res) => {
   try {
+    const { answers } = req.body;
+    const parsedAnswers = answers ? JSON.parse(answers) : [];
     const event = await Event.findById(req.params.eventId).populate('registrationCount');
     if (!event) return res.status(404).json({ success: false, message: 'Event not found' });
     if (event.status !== 'approved') {
@@ -25,17 +27,41 @@ exports.registerForEvent = async (req, res) => {
     if (exists) {
       return res.status(400).json({ success: false, message: 'Already registered for this event' });
     }
+    if (event.requiresPayment && !req.file) {
+      return res.status(400).json({ success: false, message: 'Payment screenshot is required' });
+    }
+    
+    if (event.customFields && event.customFields.length > 0) {
+      const requiredFields = event.customFields.filter(f => f.required).map(f => f.label);
+      const answeredFields = parsedAnswers.map(a => a.fieldLabel);
+      const missing = requiredFields.filter(f => !answeredFields.includes(f));
+      if (missing.length > 0) {
+        return res.status(400).json({ success: false, message: `Missing required fields: ${missing.join(', ')}` });
+      }
+    }
+
     const qrData = JSON.stringify({ userId: req.user._id, eventId: event._id, token: uuidv4() });
     const qrCode = await QRCode.toDataURL(qrData);
+
+    const registrationStatus = event.requiresPayment ? 'pending' : 'confirmed';
+
     const registration = await Registration.create({
       user: req.user._id,
       event: event._id,
-      status: 'confirmed',
+      status: registrationStatus,
       qrCode,
+      customAnswers: parsedAnswers,
+      paymentScreenshot: req.file ? `/uploads/${req.file.filename}` : '',
     });
-    // Pre-create attendance record
-    await Attendance.create({ user: req.user._id, event: event._id, checkinStatus: false });
-    try { await sendRegistrationEmail(req.user, event, qrCode); } catch (e) { /* email optional */ }
+    
+    // Pre-create attendance record ONLY if confirmed immediately
+    if (registrationStatus === 'confirmed') {
+      await Attendance.create({ user: req.user._id, event: event._id, checkinStatus: false });
+    }
+    
+    if (registrationStatus === 'confirmed') {
+      try { await sendRegistrationEmail(req.user, event, qrCode); } catch (e) { /* email optional */ }
+    }
     res.status(201).json({ success: true, message: 'Successfully registered!', registration });
   } catch (err) {
     if (err.code === 11000) {
@@ -84,7 +110,7 @@ exports.getEventParticipants = async (req, res) => {
     if (event.organizer.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
-    const participants = await Registration.find({ event: req.params.eventId, status: 'confirmed' })
+    const participants = await Registration.find({ event: req.params.eventId, status: { $in: ['confirmed', 'pending'] } })
       .populate('user', 'name email rollNumber department');
     const attendanceMap = {};
     const attendance = await Attendance.find({ event: req.params.eventId });
@@ -95,6 +121,31 @@ exports.getEventParticipants = async (req, res) => {
     }));
     res.json({ success: true, participants: result });
   } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// @desc Verify a pending registration payment
+// @route PUT /api/registrations/:id/verify
+exports.verifyPayment = async (req, res) => {
+  try {
+    const reg = await Registration.findById(req.params.id).populate('event').populate('user');
+    if (!reg) return res.status(404).json({ success: false, message: 'Registration not found' });
+    if (reg.event.organizer.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized' });
+    }
+    if (reg.status === 'confirmed') return res.status(400).json({ success: false, message: 'Already confirmed' });
+    
+    reg.status = 'confirmed';
+    await reg.save();
+    
+    // Create attendance record since it's now confirmed
+    await Attendance.create({ user: reg.user._id, event: reg.event._id, checkinStatus: false });
+    try { await sendRegistrationEmail(reg.user, reg.event, reg.qrCode); } catch (e) {}
+    
+    res.json({ success: true, message: 'Payment verified and registration confirmed' });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };

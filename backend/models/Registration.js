@@ -13,10 +13,20 @@ const RegistrationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['confirmed', 'waitlisted', 'cancelled'],
-    default: 'confirmed',
+    enum: ['pending', 'confirmed', 'waitlisted', 'cancelled'],
+    default: 'confirmed', // If payment required, controller sets this to pending
   },
   qrCode: {
+    type: String,
+    default: '',
+  },
+  customAnswers: [
+    {
+      fieldLabel: { type: String, required: true },
+      answer: { type: String, required: true },
+    }
+  ],
+  paymentScreenshot: {
     type: String,
     default: '',
   },

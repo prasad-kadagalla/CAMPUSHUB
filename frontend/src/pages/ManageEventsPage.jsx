@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { eventsAPI, qrAPI } from '../services/api';
 import { Badge, categoryColor, statusColor, EmptyState, Spinner, Modal, Button, FormField } from '../components/Shared/UI';
 
-const EMPTY_FORM = { title:'', description:'', category:'technical', date:'', time:'', venue:'', participantLimit:'', registrationDeadline:'' };
+const EMPTY_FORM = { title:'', description:'', category:'technical', date:'', time:'', venue:'', participantLimit:'', registrationDeadline:'', requiresPayment: false, fee: '', customFields: [] };
 
 export default function ManageEventsPage() {
   const [events, setEvents]       = useState([]);
@@ -13,6 +13,7 @@ export default function ManageEventsPage() {
   const [editEvent, setEditEvent] = useState(null);
   const [form, setForm]           = useState(EMPTY_FORM);
   const [poster, setPoster]       = useState(null);
+  const [paymentQr, setPaymentQr] = useState(null);
   const [saving, setSaving]       = useState(false);
   const [qrModal, setQrModal]     = useState(null);
   const [qrCode, setQrCode]       = useState('');
@@ -28,7 +29,7 @@ export default function ManageEventsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const openCreate = () => { setForm(EMPTY_FORM); setEditEvent(null); setPoster(null); setModal(true); };
+  const openCreate = () => { setForm(EMPTY_FORM); setEditEvent(null); setPoster(null); setPaymentQr(null); setModal(true); };
   const openEdit   = (ev) => {
     setEditEvent(ev);
     setForm({
@@ -37,12 +38,28 @@ export default function ManageEventsPage() {
       time: ev.time, venue: ev.venue,
       participantLimit: ev.participantLimit,
       registrationDeadline: ev.registrationDeadline ? format(new Date(ev.registrationDeadline), 'yyyy-MM-dd') : '',
+      requiresPayment: ev.requiresPayment || false,
+      fee: ev.fee || '',
+      customFields: ev.customFields || [],
     });
     setPoster(null);
+    setPaymentQr(null);
     setModal(true);
   };
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const addField = () => set('customFields', [...form.customFields, { label: '', type: 'text', options: [], required: false }]);
+  const updateField = (idx, key, val) => {
+    const arr = [...form.customFields];
+    if (key === 'optionsStr') {
+      arr[idx].options = val.split(',').map(s=>s.trim()).filter(Boolean);
+    } else {
+      arr[idx][key] = val;
+    }
+    set('customFields', arr);
+  };
+  const removeField = (idx) => set('customFields', form.customFields.filter((_, i) => i !== idx));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,8 +67,12 @@ export default function ManageEventsPage() {
     setSaving(true);
     try {
       const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+      Object.entries(form).forEach(([k, v]) => {
+        if (k === 'customFields') fd.append(k, JSON.stringify(v));
+        else fd.append(k, v);
+      });
       if (poster) fd.append('poster', poster);
+      if (paymentQr) fd.append('paymentQr', paymentQr);
       if (editEvent) {
         await eventsAPI.update(editEvent._id, fd);
         toast.success('Event updated & resubmitted for approval');
@@ -158,17 +179,78 @@ export default function ManageEventsPage() {
           <FormField label="Description" required>
             <textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder="Describe your event..." rows={3} />
           </FormField>
-          <FormField label="Event Poster (optional)">
-            <div style={{ border:'2px dashed var(--border2)', borderRadius:10, padding:20, textAlign:'center', cursor:'pointer', transition:'all 0.2s' }}
-              onClick={() => document.getElementById('poster-input').click()}
-              onMouseEnter={e => { e.currentTarget.style.borderColor='var(--purple)'; e.currentTarget.style.background='rgba(124,111,252,0.05)'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border2)'; e.currentTarget.style.background='none'; }}>
-              <div style={{ fontSize:24, marginBottom:6 }}>🖼️</div>
-              <div style={{ fontSize:13, color:'var(--text2)' }}>{poster ? poster.name : 'Click to upload poster image'}</div>
-              <input id="poster-input" type="file" accept="image/*" style={{ display:'none' }} onChange={e => setPoster(e.target.files[0])} />
+          
+          <div style={{ marginTop:24, paddingTop:24, borderTop:'1px solid var(--border)' }}>
+            <div style={{ fontWeight:600, marginBottom:16 }}>Payment Configuration</div>
+            <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:14, marginBottom:16, cursor:'pointer' }}>
+              <input type="checkbox" checked={form.requiresPayment} onChange={e => set('requiresPayment', e.target.checked)} />
+              This event requires a registration fee
+            </label>
+            {form.requiresPayment && (
+              <div className="grid-cols-2" style={{ marginBottom: 16 }}>
+                <FormField label="Registration Fee (₹)" required>
+                  <input type="number" value={form.fee} onChange={e => set('fee', e.target.value)} placeholder="500" min="1" />
+                </FormField>
+                <FormField label="Payment QR Code Image" required={!editEvent || !editEvent.paymentQr}>
+                  <div style={{ border:'2px dashed var(--border2)', borderRadius:10, padding:12, textAlign:'center', cursor:'pointer' }}
+                    onClick={() => document.getElementById('qr-input').click()}>
+                    <div style={{ fontSize:16, marginBottom:4 }}>📲</div>
+                    <div style={{ fontSize:11, color:'var(--text2)' }}>{paymentQr ? paymentQr.name : 'Upload QR Code'}</div>
+                    <input id="qr-input" type="file" accept="image/*" style={{ display:'none' }} onChange={e => setPaymentQr(e.target.files[0])} />
+                  </div>
+                </FormField>
+              </div>
+            )}
+          </div>
+
+          <div style={{ marginTop:24, paddingTop:24, borderTop:'1px solid var(--border)' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+              <div style={{ fontWeight:600 }}>Custom Registration Form</div>
+              <button type="button" onClick={addField} style={{ background:'var(--purple)', color:'#fff', border:'none', padding:'4px 12px', borderRadius:6, fontSize:12, cursor:'pointer' }}>+ Add Question</button>
             </div>
-          </FormField>
-          <div style={{ display:'flex', gap:10, marginTop:8 }}>
+            {form.customFields.map((f, idx) => (
+              <div key={idx} style={{ background:'var(--bg3)', padding:16, borderRadius:10, marginBottom:12, position:'relative', border:'1px solid var(--border)' }}>
+                <button type="button" onClick={() => removeField(idx)} style={{ position:'absolute', top:12, right:12, background:'none', color:'var(--coral)', border:'none', cursor:'pointer', fontSize:14 }}>✕</button>
+                <div className="grid-cols-2" style={{ marginBottom: 12, marginTop: 4 }}>
+                  <FormField label="Question Label" required>
+                    <input value={f.label} onChange={e=>updateField(idx, 'label', e.target.value)} placeholder="e.g. T-Shirt Size" required />
+                  </FormField>
+                  <FormField label="Answer Type">
+                    <select value={f.type} onChange={e=>updateField(idx, 'type', e.target.value)}>
+                      <option value="text">Short Answer</option>
+                      <option value="textarea">Paragraph</option>
+                      <option value="dropdown">Dropdown Options</option>
+                    </select>
+                  </FormField>
+                </div>
+                {f.type === 'dropdown' && (
+                  <FormField label="Dropdown Options (comma separated)" required>
+                    <input value={f.options?.join(', ') || ''} onChange={e=>updateField(idx, 'optionsStr', e.target.value)} placeholder="Small, Medium, Large" required />
+                  </FormField>
+                )}
+                <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, cursor:'pointer' }}>
+                  <input type="checkbox" checked={f.required} onChange={e => updateField(idx, 'required', e.target.checked)} />
+                  Required Field
+                </label>
+              </div>
+            ))}
+            {form.customFields.length === 0 && (
+              <div style={{ fontSize:13, color:'var(--text3)', textAlign:'center', padding:'20px 0' }}>No custom questions added.</div>
+            )}
+          </div>
+
+          <div style={{ marginTop:24, paddingTop:24, borderTop:'1px solid var(--border)' }}>
+            <FormField label="Event Poster (optional)">
+              <div style={{ border:'2px dashed var(--border2)', borderRadius:10, padding:20, textAlign:'center', cursor:'pointer', transition:'all 0.2s' }}
+                onClick={() => document.getElementById('poster-input').click()}>
+                <div style={{ fontSize:24, marginBottom:6 }}>🖼️</div>
+                <div style={{ fontSize:13, color:'var(--text2)' }}>{poster ? poster.name : 'Click to upload poster image'}</div>
+                <input id="poster-input" type="file" accept="image/*" style={{ display:'none' }} onChange={e => setPoster(e.target.files[0])} />
+              </div>
+            </FormField>
+          </div>
+
+          <div style={{ display:'flex', gap:10, marginTop:24 }}>
             <Button variant="secondary" fullWidth type="button" onClick={() => setModal(false)}>Cancel</Button>
             <Button fullWidth type="submit" loading={saving}>{editEvent ? 'Update Event' : 'Submit for Approval'}</Button>
           </div>
@@ -197,7 +279,7 @@ function SmBtn({ children, onClick, danger }) {
   return (
     <button onClick={onClick}
       style={{ background:'none', border:'1px solid var(--border)', borderRadius:6, padding:'4px 9px', fontSize:11, cursor:'pointer', color:'var(--text2)', transition:'all 0.2s', fontFamily:"'DM Sans',sans-serif" }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = danger ? 'var(--coral)' : 'var(--purple)'; e.currentTarget.style.color = danger ? 'var(--coral)' : 'var(--purple2)'; }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = danger ? 'var(--coral)' : 'var(--purple)'; e.currentTarget.style.color = danger ? 'var(--coral)' : 'var(--purple)'; }}
       onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
       {children}
     </button>

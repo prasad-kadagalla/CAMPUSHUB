@@ -57,6 +57,26 @@ const EventSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  customFields: [
+    {
+      label: { type: String, required: true },
+      type: { type: String, enum: ['text', 'textarea', 'dropdown'], required: true },
+      options: [{ type: String }], // Only for dropdowns
+      required: { type: Boolean, default: false },
+    }
+  ],
+  requiresPayment: {
+    type: Boolean,
+    default: false,
+  },
+  fee: {
+    type: Number,
+    default: 0,
+  },
+  paymentQr: {
+    type: String, // URL to the uploaded QR image
+    default: '',
+  },
   tags: [{ type: String }],
   isFeatured: {
     type: Boolean,

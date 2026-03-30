@@ -45,10 +45,11 @@ export const eventsAPI = {
 
 // Registrations
 export const registrationsAPI = {
-  register:      (eventId) => API.post(`/registrations/${eventId}`),
+  register:      (eventId, data) => API.post(`/registrations/${eventId}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   cancel:        (eventId) => API.delete(`/registrations/${eventId}`),
   getMy:         ()        => API.get('/registrations/me'),
   getParticipants: (eventId) => API.get(`/registrations/event/${eventId}`),
+  verifyPayment: (id)      => API.put(`/registrations/${id}/verify`),
 };
 
 // Attendance

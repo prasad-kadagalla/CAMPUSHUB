@@ -54,14 +54,21 @@ exports.getEvent = async (req, res) => {
 // @route POST /api/events
 exports.createEvent = async (req, res) => {
   try {
-    const { title, description, category, date, time, venue, participantLimit, registrationDeadline, tags } = req.body;
-    const poster = req.file ? `/uploads/${req.file.filename}` : '';
+    const { title, description, category, date, time, venue, participantLimit, registrationDeadline, tags, requiresPayment, fee, customFields } = req.body;
+    
+    const poster = req.files && req.files['poster'] ? `/uploads/${req.files['poster'][0].filename}` : '';
+    const paymentQr = req.files && req.files['paymentQr'] ? `/uploads/${req.files['paymentQr'][0].filename}` : '';
+
     const event = await Event.create({
       title, description, category, date, time, venue,
       participantLimit: parseInt(participantLimit),
       registrationDeadline,
       tags: tags ? JSON.parse(tags) : [],
+      customFields: customFields ? JSON.parse(customFields) : [],
+      requiresPayment: requiresPayment === 'true',
+      fee: fee ? parseInt(fee) : 0,
       poster,
+      paymentQr,
       organizer: req.user._id,
       status: 'pending',
     });
@@ -82,7 +89,14 @@ exports.updateEvent = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Not authorized to update this event' });
     }
     const updateData = { ...req.body };
-    if (req.file) updateData.poster = `/uploads/${req.file.filename}`;
+    if (updateData.tags) updateData.tags = JSON.parse(updateData.tags);
+    if (updateData.customFields) updateData.customFields = JSON.parse(updateData.customFields);
+    if (updateData.requiresPayment !== undefined) updateData.requiresPayment = updateData.requiresPayment === 'true';
+    if (updateData.fee !== undefined) updateData.fee = parseInt(updateData.fee);
+
+    if (req.files && req.files['poster']) updateData.poster = `/uploads/${req.files['poster'][0].filename}`;
+    if (req.files && req.files['paymentQr']) updateData.paymentQr = `/uploads/${req.files['paymentQr'][0].filename}`;
+
     if (req.user.role !== 'admin') {
       delete updateData.status;
       delete updateData.adminNote;

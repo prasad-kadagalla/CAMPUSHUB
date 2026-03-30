@@ -7,7 +7,7 @@ import { Badge, categoryColor, statusColor, EmptyState, Spinner, Modal, Button, 
 
 const CATEGORIES = ['all','technical','cultural','sports','workshop'];
 const CAT_EMOJIS = { technical:'💻', cultural:'🎭', sports:'🏅', workshop:'🔧' };
-const CAT_BG     = { technical:'#1a1c40', cultural:'#2e1a20', sports:'#0e2828', workshop:'#2a2010' };
+const CAT_BG     = { technical:'#EEF2FF', cultural:'#FEF3C7', sports:'#E6FFFA', workshop:'#F3F4F6' };
 
 export default function EventsPage() {
   const { user } = useAuth();
@@ -18,6 +18,9 @@ export default function EventsPage() {
   const [search, setSearch]     = useState('');
   const [selected, setSelected] = useState(null);
   const [regLoading, setRegLoading] = useState(null);
+  const [regModal, setRegModal] = useState(null);
+  const [formAnswers, setFormAnswers] = useState({});
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -37,16 +40,49 @@ export default function EventsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const handleRegister = async (eventId) => {
+  const handleRegisterClick = (ev) => {
+    if ((ev.customFields && ev.customFields.length > 0) || ev.requiresPayment) {
+      setRegModal(ev);
+      setFormAnswers({});
+      setPaymentScreenshot(null);
+      if (selected) setSelected(null);
+    } else {
+      submitRegistration(ev._id, new FormData());
+    }
+  };
+
+  const submitRegistration = async (eventId, fd) => {
     setRegLoading(eventId);
     try {
-      await registrationsAPI.register(eventId);
+      await registrationsAPI.register(eventId, fd);
       setMyRegs(prev => new Set([...prev, eventId]));
-      toast.success('🎉 Registered successfully! Check your email.');
+      toast.success('🎉 Registered successfully!');
+      setRegModal(null);
       load();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally { setRegLoading(null); }
+  };
+
+  const handleModalSubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData();
+    const answersArr = regModal.customFields?.map(f => ({
+      fieldLabel: f.label,
+      answer: formAnswers[f.label] || '',
+    })) || [];
+    
+    const missing = regModal.customFields?.filter(f => f.required && !formAnswers[f.label]);
+    if (missing?.length > 0) return toast.error('Please fill all required fields');
+
+    fd.append('answers', JSON.stringify(answersArr));
+
+    if (regModal.requiresPayment) {
+      if (!paymentScreenshot) return toast.error('Payment screenshot is required.');
+      fd.append('paymentScreenshot', paymentScreenshot);
+    }
+
+    submitRegistration(regModal._id, fd);
   };
 
   return (
@@ -61,9 +97,9 @@ export default function EventsPage() {
         {CATEGORIES.map(c => (
           <button key={c} onClick={() => setCat(c)}
             style={{ padding:'8px 16px', borderRadius:8, border:'1px solid', fontSize:12, fontWeight:500, cursor:'pointer', transition:'all 0.2s', textTransform:'capitalize',
-              background: cat===c ? 'rgba(124,111,252,0.15)' : 'var(--bg3)',
+              background: cat===c ? '#EEF2FF' : 'var(--bg2)',
               borderColor: cat===c ? 'var(--purple)' : 'var(--border)',
-              color: cat===c ? 'var(--purple2)' : 'var(--text2)',
+              color: cat===c ? 'var(--purple)' : 'var(--text2)',
             }}>
             {c === 'all' ? 'All' : `${CAT_EMOJIS[c]} ${c.charAt(0).toUpperCase()+c.slice(1)}`}
           </button>
@@ -85,7 +121,7 @@ export default function EventsPage() {
               isRegistered={myRegs.has(ev._id)}
               isStudent={user.role === 'student'}
               regLoading={regLoading === ev._id}
-              onRegister={() => handleRegister(ev._id)}
+              onRegister={() => handleRegisterClick(ev)}
               onView={() => setSelected(ev)}
             />
           ))}
@@ -94,7 +130,52 @@ export default function EventsPage() {
 
       {/* Event Detail Modal */}
       <Modal isOpen={!!selected} onClose={() => setSelected(null)} title={selected?.title || ''} maxWidth="640px">
-        {selected && <EventDetail event={selected} isRegistered={myRegs.has(selected._id)} isStudent={user.role==='student'} onRegister={() => { handleRegister(selected._id); setSelected(null); }} regLoading={regLoading === selected._id} />}
+        {selected && <EventDetail event={selected} isRegistered={myRegs.has(selected._id)} isStudent={user.role==='student'} onRegister={() => handleRegisterClick(selected)} regLoading={regLoading === selected._id} />}
+      </Modal>
+
+      {/* Dynamic Registration Modal */}
+      <Modal isOpen={!!regModal} onClose={() => setRegModal(null)} title={`Register: ${regModal?.title}`} maxWidth="500px">
+        {regModal && (
+          <form onSubmit={handleModalSubmit}>
+            {regModal.requiresPayment && (
+              <div style={{ marginBottom:20, padding:16, background:'var(--card)', border:'1px solid var(--border)', borderRadius:12 }}>
+                <div style={{ fontWeight:700, marginBottom:16, textAlign:'center' }}>Event Registration Fee: ₹{regModal.fee}</div>
+                {regModal.paymentQr && (
+                  <div style={{ display:'flex', justifyContent:'center', marginBottom:16 }}>
+                    <img src={`http://localhost:5000${regModal.paymentQr}`} alt="Payment QR" style={{ width:200, height:200, objectFit:'contain', background:'#fff', padding:8, borderRadius:12, border:'1px solid var(--border)' }} />
+                  </div>
+                )}
+                <FormField label="Upload Payment Screenshot" required>
+                  <input type="file" accept="image/*" onChange={e => setPaymentScreenshot(e.target.files[0])} style={{ fontSize:13 }} required />
+                </FormField>
+              </div>
+            )}
+
+            {regModal.customFields && regModal.customFields.length > 0 && (
+              <div style={{ marginBottom:20 }}>
+                {regModal.customFields.map((f, i) => (
+                  <FormField key={i} label={f.label} required={f.required}>
+                    {f.type === 'textarea' ? (
+                      <textarea rows={3} value={formAnswers[f.label] || ''} onChange={e => setFormAnswers({...formAnswers, [f.label]: e.target.value})} required={f.required} />
+                    ) : f.type === 'dropdown' ? (
+                      <select value={formAnswers[f.label] || ''} onChange={e => setFormAnswers({...formAnswers, [f.label]: e.target.value})} required={f.required}>
+                        <option value="">Select an option</option>
+                        {f.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
+                    ) : (
+                      <input type="text" value={formAnswers[f.label] || ''} onChange={e => setFormAnswers({...formAnswers, [f.label]: e.target.value})} required={f.required} />
+                    )}
+                  </FormField>
+                ))}
+              </div>
+            )}
+            
+            <div style={{ display:'flex', gap:10 }}>
+              <Button type="button" variant="secondary" fullWidth onClick={() => setRegModal(null)}>Cancel</Button>
+              <Button type="submit" fullWidth loading={regLoading === regModal._id}>Confirm Registration</Button>
+            </div>
+          </form>
+        )}
       </Modal>
     </div>
   );
@@ -107,10 +188,10 @@ function EventCard({ event, isRegistered, isStudent, regLoading, onRegister, onV
 
   return (
     <div style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:16, overflow:'hidden', transition:'all 0.2s', display:'flex', flexDirection:'column' }}
-      onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 0 32px rgba(124,111,252,0.22)';e.currentTarget.style.borderColor='var(--border2)';}}
+      onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='var(--shadow-md)';e.currentTarget.style.borderColor='var(--border2)';}}
       onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='';e.currentTarget.style.borderColor='';}}>
       {/* Poster */}
-      <div onClick={onView} style={{ height:140, background:CAT_BG[event.category]||'#1a1c35', display:'flex', alignItems:'center', justifyContent:'center', fontSize:52, position:'relative', cursor:'pointer' }}>
+      <div onClick={onView} style={{ height:140, background:CAT_BG[event.category]||'var(--bg2)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:52, position:'relative', cursor:'pointer' }}>
         {event.poster
           ? <img src={`http://localhost:5000${event.poster}`} alt={event.title} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
           : <span>{CAT_EMOJIS[event.category]||'🎪'}</span>
@@ -136,7 +217,7 @@ function EventCard({ event, isRegistered, isStudent, regLoading, onRegister, onV
                 <span>{event.registrationCount||0}/{event.participantLimit} registered</span><span>{pct}%</span>
               </div>
               <div style={{ height:3, background:'var(--bg3)', borderRadius:2 }}>
-                <div style={{ height:'100%', width:`${pct}%`, background:'linear-gradient(90deg,var(--purple3),var(--teal))', borderRadius:2, transition:'width 0.5s' }} />
+                <div style={{ height:'100%', width:`${pct}%`, background:'var(--purple)', borderRadius:2, transition:'width 0.5s' }} />
               </div>
             </div>
           )}
@@ -147,9 +228,9 @@ function EventCard({ event, isRegistered, isStudent, regLoading, onRegister, onV
               onClick={onRegister}
               style={{
                 width:'100%', border:'none', borderRadius:8, padding:'8px', fontSize:12, fontWeight:600, cursor: (isRegistered||isFull||deadlinePassed) ? 'default' : 'pointer', transition:'all 0.2s',
-                background: isRegistered ? 'rgba(74,222,128,0.15)' : isFull||deadlinePassed ? 'rgba(107,107,142,0.2)' : 'var(--purple3)',
+                background: isRegistered ? '#D1FAE5' : isFull||deadlinePassed ? 'var(--bg3)' : 'var(--purple)',
                 color: isRegistered ? 'var(--green)' : isFull||deadlinePassed ? 'var(--text3)' : '#fff',
-                border: isRegistered ? '1px solid rgba(74,222,128,0.4)' : 'none',
+                border: isRegistered ? '1px solid var(--green)' : 'none',
               }}>
               {regLoading ? '⟳ Registering...' : isRegistered ? '✓ Registered' : isFull ? 'Event Full' : deadlinePassed ? 'Deadline Passed' : 'Register Now'}
             </button>
@@ -164,7 +245,7 @@ function EventDetail({ event, isRegistered, isStudent, onRegister, regLoading })
   const isFull = (event.registrationCount||0) >= event.participantLimit;
   return (
     <div>
-      <div style={{ height:200, background:CAT_BG[event.category]||'#1a1c35', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center', fontSize:80, marginBottom:20, position:'relative', overflow:'hidden' }}>
+      <div style={{ height:200, background:CAT_BG[event.category]||'var(--bg2)', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center', fontSize:80, marginBottom:20, position:'relative', overflow:'hidden' }}>
         {event.poster
           ? <img src={`http://localhost:5000${event.poster}`} alt={event.title} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
           : <span>{CAT_EMOJIS[event.category]||'🎪'}</span>

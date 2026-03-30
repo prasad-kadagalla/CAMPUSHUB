@@ -13,13 +13,13 @@ router.get('/:id', protect, getEvent);
 
 router.post('/',
   protect, authorize('organizer'),
-  upload.single('poster'),
+  upload.fields([{ name: 'poster', maxCount: 1 }, { name: 'paymentQr', maxCount: 1 }]),
   createEvent
 );
 
 router.put('/:id',
   protect, authorize('organizer', 'admin'),
-  upload.single('poster'),
+  upload.fields([{ name: 'poster', maxCount: 1 }, { name: 'paymentQr', maxCount: 1 }]),
   updateEvent
 );
 
